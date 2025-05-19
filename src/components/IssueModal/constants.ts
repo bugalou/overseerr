@@ -32,4 +32,8 @@ export const issueOptions: IssueOption[] = [
     name: messages.issueOther,
     issueType: IssueType.OTHER,
   },
+  {
+    name: { id: 'issueUpgradeQuality', defaultMessage: 'Upgrade Quality' }, // <-- Add this line
+    issueType: IssueType.UPGRADE_QUALITY, // <-- Add this line
+  },
 ];
