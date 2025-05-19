@@ -7,6 +7,7 @@ import globalMessages from '@app/i18n/globalMessages';
 import { RadioGroup } from '@headlessui/react';
 import { ArrowRightCircleIcon } from '@heroicons/react/24/solid';
 import { MediaStatus } from '@server/constants/media';
+import { IssueType } from '@server/constants/issue';
 import type Issue from '@server/entity/Issue';
 import type { MovieDetails } from '@server/models/Movie';
 import type { TvDetails } from '@server/models/Tv';
@@ -36,6 +37,9 @@ const messages = defineMessages({
   toastviewissue: 'View Issue',
   reportissue: 'Report an Issue',
   submitissue: 'Submit Issue',
+  requestedVideoQuality: 'Requested Video Quality',
+  upgradeAudio: 'Upgrade Audio to Surround Sound',
+  validationUpgradeRequired: 'You must select a video quality or request an audio upgrade',
 });
 
 const isMovie = (movie: MovieDetails | TvDetails): movie is MovieDetails => {
@@ -83,12 +87,6 @@ const CreateIssueModal = ({
     )
     .map((season) => season.seasonNumber);
 
-  const CreateIssueModalSchema = Yup.object().shape({
-    message: Yup.string().required(
-      intl.formatMessage(messages.validationMessageRequired)
-    ),
-  });
-
   return (
     <Formik
       initialValues={{
@@ -96,13 +94,55 @@ const CreateIssueModal = ({
         message: '',
         problemSeason: availableSeasons.length === 1 ? availableSeasons[0] : 0,
         problemEpisode: 0,
+        requestedVideoQuality: '',
+        upgradeAudio: false,
       }}
-      validationSchema={CreateIssueModalSchema}
+      validationSchema={Yup.object().shape({
+        message: Yup.string().when('selectedIssue', {
+          //is: (issue) => issue.issueType === IssueType.UPGRADE_QUALITY,
+          is: (issue: { issueType: IssueType }) => issue.issueType === IssueType.UPGRADE_QUALITY,
+          then: Yup.string(), // Not required for upgrade quality
+          otherwise: Yup.string().required(
+            intl.formatMessage(messages.validationMessageRequired)
+          ),
+        }),
+        requestedVideoQuality: Yup.string().when('selectedIssue', {
+          is: (issue: { issueType: IssueType }) => issue.issueType === IssueType.UPGRADE_QUALITY,
+          then: Yup.string(),
+          otherwise: Yup.string().notRequired(),
+        }),
+        upgradeAudio: Yup.boolean(),
+      })}
+      validate={(values) => {
+        const errors: any = {};
+        if (
+          values.selectedIssue.issueType === IssueType.UPGRADE_QUALITY &&
+          !values.requestedVideoQuality &&
+          !values.upgradeAudio
+        ) {
+          errors.requestedVideoQuality = intl.formatMessage(
+            messages.validationUpgradeRequired
+          );
+        }
+        return errors;
+      }}
       onSubmit={async (values) => {
         try {
+          let message = values.message;
+          if (values.selectedIssue.issueType === IssueType.UPGRADE_QUALITY) {
+            message = '';
+            if (values.requestedVideoQuality) {
+              message += `Requested Quality: ${values.requestedVideoQuality}`;
+            }
+            if (values.upgradeAudio) {
+              if (message) message += '; ';
+              message += 'Audio upgrade requested';
+            }
+          }
+
           const newIssue = await axios.post<Issue>('/api/v1/issue', {
             issueType: values.selectedIssue.issueType,
-            message: values.message,
+            message,
             mediaId: data?.mediaInfo?.id,
             problemSeason: values.problemSeason,
             problemEpisode:
@@ -145,7 +185,7 @@ const CreateIssueModal = ({
         }
       }}
     >
-      {({ handleSubmit, values, setFieldValue, errors, touched }) => {
+      {({ handleSubmit, values, setFieldValue, errors, touched, handleChange }) => {
         return (
           <Modal
             backgroundClickable
@@ -291,6 +331,67 @@ const CreateIssueModal = ({
                 ))}
               </div>
             </RadioGroup>
+            {values.selectedIssue.issueType === IssueType.UPGRADE_QUALITY ? (
+              <>
+                <div className="form-row">
+                  <label htmlFor="requestedVideoQuality" className="text-label">
+                    {intl.formatMessage(messages.requestedVideoQuality)}
+                  </label>
+                  <div className="form-input-area">
+                    <select
+                      id="requestedVideoQuality"
+                      name="requestedVideoQuality"
+                      value={values.requestedVideoQuality}
+                      onChange={handleChange}
+                      className="form-input-field"
+                    >
+                      <option value="">{/* empty default */}</option>
+                      <option value="HD">HD</option>
+                      <option value="UHD">UHD</option>
+                      <option value="AI Upscale">AI Upscale</option>
+                    </select>
+                    {errors.requestedVideoQuality &&
+                      touched.requestedVideoQuality && (
+                        <div className="error">
+                          {errors.requestedVideoQuality}
+                        </div>
+                      )}
+                  </div>
+                </div>
+                <div className="form-row">
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="upgradeAudio"
+                      checked={values.upgradeAudio}
+                      onChange={() =>
+                        setFieldValue('upgradeAudio', !values.upgradeAudio)
+                      }
+                      className="mr-2"
+                    />
+                    {intl.formatMessage(messages.upgradeAudio)}
+                  </label>
+                </div>
+              </>
+            ) : (
+              <div className="form-row">
+                <label htmlFor="message" className="text-label">
+                  {intl.formatMessage(messages.whatswrong)}
+                </label>
+                <div className="form-input-area">
+                  <Field
+                    as="textarea"
+                    id="message"
+                    name="message"
+                    className="form-input-field"
+                    placeholder={intl.formatMessage(messages.providedetail)}
+                  />
+                  {errors.message && touched.message && (
+                    <div className="error">{errors.message}</div>
+                  )}
+                </div>
+              </div>
+            )}
             <div className="mt-4 flex-col space-y-2">
               <label htmlFor="message">
                 {intl.formatMessage(messages.whatswrong)}
