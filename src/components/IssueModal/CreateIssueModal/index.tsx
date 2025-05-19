@@ -373,25 +373,23 @@ const CreateIssueModal = ({
                 </div>
               </>
             ) : (
-              <div className="form-row">
+              <div className="mt-4 flex-col space-y-2">
                 <label htmlFor="message" className="text-label">
                   {intl.formatMessage(messages.whatswrong)}
+                  <span className="label-required">*</span>
                 </label>
-                <div className="form-input-area">
-                  <Field
-                    as="textarea"
-                    id="message"
-                    name="message"
-                    className="form-input-field"
-                    placeholder={intl.formatMessage(messages.providedetail)}
-                  />
+                <Field
+                  as="textarea"
+                  name="message"
+                  id="message"
+                  className="h-28"
+                  placeholder={intl.formatMessage(messages.providedetail)}
+                />
                   {errors.message && touched.message && (
                     <div className="error">{errors.message}</div>
                   )}
-                </div>
               </div>
             )}
-          
           </Modal>
         );
       }}
