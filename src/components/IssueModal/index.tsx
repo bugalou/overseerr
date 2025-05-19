@@ -1,40 +1,31 @@
-import { IssueType } from '@server/constants/issue';
-import type { MessageDescriptor } from 'react-intl';
-import { defineMessages } from 'react-intl';
+import CreateIssueModal from '@app/components/IssueModal/CreateIssueModal';
+import { Transition } from '@headlessui/react';
 
-const messages = defineMessages({
-  issueAudio: 'Audio',
-  issueVideo: 'Video',
-  issueSubtitles: 'Subtitle',
-  issueOther: 'Other',
-  issueUpgradeQuality: 'Upgrade Quality',
-});
-
-interface IssueOption {
-  name: MessageDescriptor;
-  issueType: IssueType;
-  mediaType?: 'movie' | 'tv';
+interface IssueModalProps {
+  show?: boolean;
+  onCancel: () => void;
+  mediaType: 'movie' | 'tv';
+  tmdbId: number;
+  issueId?: never;
 }
 
-export const issueOptions: IssueOption[] = [
-  {
-    name: messages.issueVideo,
-    issueType: IssueType.VIDEO,
-  },
-  {
-    name: messages.issueAudio,
-    issueType: IssueType.AUDIO,
-  },
-  {
-    name: messages.issueSubtitles,
-    issueType: IssueType.SUBTITLES,
-  },
-  {
-    name: messages.issueOther,
-    issueType: IssueType.OTHER,
-  },
-  {
-    name: messages.issueUpgradeQuality,
-    issueType: IssueType.UPGRADE_QUALITY, // <-- Add this line
-  },
-];
+const IssueModal = ({ show, mediaType, onCancel, tmdbId }: IssueModalProps) => (
+  <Transition
+    as="div"
+    enter="transition-opacity duration-300"
+    enterFrom="opacity-0"
+    enterTo="opacity-100"
+    leave="transition-opacity duration-300"
+    leaveFrom="opacity-100"
+    leaveTo="opacity-0"
+    show={show}
+  >
+    <CreateIssueModal
+      mediaType={mediaType}
+      onCancel={onCancel}
+      tmdbId={tmdbId}
+    />
+  </Transition>
+);
+
+export default IssueModal;
