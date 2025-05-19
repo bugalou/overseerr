@@ -7,6 +7,7 @@ const messages = defineMessages({
   issueVideo: 'Video',
   issueSubtitles: 'Subtitle',
   issueOther: 'Other',
+  issueUpgradeQuality: 'Upgrade Quality',
 });
 
 interface IssueOption {
@@ -31,5 +32,9 @@ export const issueOptions: IssueOption[] = [
   {
     name: messages.issueOther,
     issueType: IssueType.OTHER,
+  },
+  {
+    name: messages.issueUpgradeQuality, // <-- Add this line
+    issueType: IssueType.UPGRADE_QUALITY, // <-- Add this line
   },
 ];
