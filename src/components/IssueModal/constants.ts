@@ -38,5 +38,3 @@ export const issueOptions: IssueOption[] = [
     issueType: IssueType.UPGRADE_QUALITY, // <-- Add this line
   },
 ];
-
-export default IssueModal;
