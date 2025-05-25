@@ -2,7 +2,6 @@ import 'reflect-metadata';
 import type { DataSourceOptions, EntityTarget, Repository } from 'typeorm';
 import { DataSource } from 'typeorm';
 
-
 const devConfig: DataSourceOptions = {
   type: 'sqlite',
   database: process.env.CONFIG_DIRECTORY
@@ -14,7 +13,7 @@ const devConfig: DataSourceOptions = {
   enableWAL: true,
   entities: ['server/entity/**/*.ts'],
   migrations: ['server/migration/**/*.ts'],
-  subscribers: ['server/subscriber/**/*.ts'],  
+  subscribers: ['server/subscriber/**/*.ts'],
 };
 
 const prodConfig: DataSourceOptions = {

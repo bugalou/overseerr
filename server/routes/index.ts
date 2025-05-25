@@ -20,7 +20,6 @@ import { appDataPath, appDataStatus } from '@server/utils/appDataVolume';
 import { getAppVersion, getCommitTag } from '@server/utils/appVersion';
 import restartFlag from '@server/utils/restartFlag';
 import { isPerson } from '@server/utils/typeHelpers';
-
 import { Router } from 'express';
 import authRoutes from './auth';
 import collectionRoutes from './collection';
