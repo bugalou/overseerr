@@ -56,3 +56,6 @@ export const isAuthenticated = (
   };
   return authMiddleware;
 };
+
+export { Permission } from '@server/lib/permissions';
+

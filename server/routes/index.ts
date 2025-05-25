@@ -34,7 +34,7 @@ import searchRoutes from './search';
 import serviceRoutes from './service';
 import tvRoutes from './tv';
 import user from './user';
-import { News } from '../entity/News';
+import { News } from '@server/entity/News';
 import newsRoutes from './news';
 const router = Router();
 
@@ -88,7 +88,7 @@ router.get<unknown, StatusResponse>('/status', async (req, res) => {
   });
 });
 
-router.get('/status/appdata', (_req, res) => {
+router.get('/status/appdata', (_req: Request, res: Response) => {
   return res.status(200).json({
     appData: appDataStatus(),
     appDataPath: appDataPath(),
@@ -107,7 +107,7 @@ router.get('/settings/public', async (req, res) => {
     return res.status(200).json(settings.fullPublicSettings);
   }
 });
-router.get('/settings/discover', isAuthenticated(), async (_req, res) => {
+router.get('/settings/discover', isAuthenticated(), async (_req: Request, res: Response) => {
   const sliderRepository = getRepository(DiscoverSlider);
 
   const sliders = await sliderRepository.find({ order: { order: 'ASC' } });
@@ -117,7 +117,7 @@ router.get('/settings/discover', isAuthenticated(), async (_req, res) => {
 router.get(
   '/settings/notifications/pushover/sounds',
   isAuthenticated(),
-  async (req, res, next) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     const pushoverApi = new PushoverAPI();
 
     try {
@@ -154,7 +154,7 @@ router.use('/issueComment', isAuthenticated(), issueCommentRoutes);
 router.use('/auth', authRoutes);
 router.use('/api/v1/news', newsRoutes);
 
-router.get('/regions', isAuthenticated(), async (req, res, next) => {
+router.get('/regions', isAuthenticated(), async (req: Request, res: Response, next: NextFunction) => {
   const tmdb = new TheMovieDb();
 
   try {
@@ -173,7 +173,7 @@ router.get('/regions', isAuthenticated(), async (req, res, next) => {
   }
 });
 
-router.get('/languages', isAuthenticated(), async (req, res, next) => {
+router.get('/languages', isAuthenticated(), async (req: Request, res: Response, next: NextFunction) => {
   const tmdb = new TheMovieDb();
 
   try {
@@ -192,7 +192,7 @@ router.get('/languages', isAuthenticated(), async (req, res, next) => {
   }
 });
 
-router.get<{ id: string }>('/studio/:id', async (req, res, next) => {
+router.get<{ id: string }>('/studio/:id', async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
   const tmdb = new TheMovieDb();
 
   try {
@@ -212,7 +212,7 @@ router.get<{ id: string }>('/studio/:id', async (req, res, next) => {
   }
 });
 
-router.get<{ id: string }>('/network/:id', async (req, res, next) => {
+router.get<{ id: string }>('/network/:id', async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
   const tmdb = new TheMovieDb();
 
   try {
@@ -232,7 +232,7 @@ router.get<{ id: string }>('/network/:id', async (req, res, next) => {
   }
 });
 
-router.get('/genres/movie', isAuthenticated(), async (req, res, next) => {
+router.get('/genres/movie', isAuthenticated(), async (req: Request, res: Response, next: NextFunction) => {
   const tmdb = new TheMovieDb();
 
   try {
@@ -253,7 +253,7 @@ router.get('/genres/movie', isAuthenticated(), async (req, res, next) => {
   }
 });
 
-router.get('/genres/tv', isAuthenticated(), async (req, res, next) => {
+router.get('/genres/tv', isAuthenticated(), async (req: Request, res: Response, next: NextFunction) => {
   const tmdb = new TheMovieDb();
 
   try {
@@ -274,7 +274,7 @@ router.get('/genres/tv', isAuthenticated(), async (req, res, next) => {
   }
 });
 
-router.get('/backdrops', async (req, res, next) => {
+router.get('/backdrops', async (req: Request, res: Response, next: NextFunction) => {
   const tmdb = createTmdbWithRegionLanguage();
 
   try {
@@ -307,7 +307,7 @@ router.get('/backdrops', async (req, res, next) => {
   }
 });
 
-router.get('/keyword/:keywordId', async (req, res, next) => {
+router.get('/keyword/:keywordId', async (req: Request, res: Response, next: NextFunction) => {
   const tmdb = createTmdbWithRegionLanguage();
 
   try {
@@ -328,7 +328,7 @@ router.get('/keyword/:keywordId', async (req, res, next) => {
   }
 });
 
-router.get('/watchproviders/regions', async (req, res, next) => {
+router.get('/watchproviders/regions', async (req: Request, res: Response, next: NextFunction) => {
   const tmdb = createTmdbWithRegionLanguage();
 
   try {
